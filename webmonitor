@@ -1,0 +1,71 @@
+(Get-Host).UI.RawUI.WindowTitle =  "Websites"
+
+
+$URI=(
+"https://www.google.com",
+"http://www.microsoft.com",
+"http://www.yahoo.com"
+)
+
+
+while ($true) {
+
+                $URI | foreach{
+                    $hostRemoto=$_
+                    try{
+                        
+                        $site=(Invoke-WebRequest -Uri $hostRemoto -UseBasicParsing -DisableKeepAlive).StatusCode
+       
+                       }catch{
+                             $ex=$_
+                            switch($ex.exception.response.statusCode.value__){
+							(400)
+                               {
+                                write-host "$(Get-Date -Format G) - ${hostRemoto} BadRequest ($ex.errorDetails.message)" -ForegroundColor red
+                                [console]::beep(2000,500)
+                                continue
+                               }
+							(403)
+                               {
+                                write-host "$(Get-Date -Format G) - ${hostRemoto} Forbidden ($ex.errorDetails.message)" -ForegroundColor red
+                                [console]::beep(2000,500)
+                                continue
+                               }
+                            (404)
+                               {
+                                write-host "$(Get-Date -Format G) - ${hostRemoto} NotFound ($ex.errorDetails.message)" -ForegroundColor red
+                                [console]::beep(2000,500)
+                                continue
+                               }
+							(405)
+                               {
+                                write-host "$(Get-Date -Format G) - ${hostRemoto} MethodNotAllowed ($ex.errorDetails.message)" -ForegroundColor red
+                                [console]::beep(2000,500)
+                                continue
+                               }
+                            (500)
+                               {
+                                write-host "$(Get-Date -Format G) - ${hostRemoto} InternalServerError ($ex.errorDetails.message)"  -ForegroundColor red               
+                                [console]::beep(2000,500)
+                                continue
+                               }
+							(503)
+                               {
+                                write-host "$(Get-Date -Format G) - ${hostRemoto} ServiceUnavailable ($ex.errorDetails.message)" -ForegroundColor red
+                                [console]::beep(2000,500)
+                                continue
+                               }
+                            default
+                               {
+                                write-host "$(Get-Date -Format G) - ${hostRemoto} OtherError (${ex})" -ForegroundColor red 
+                                [console]::beep(2000,500)             
+                                continue
+                               }
+                             }
+                          }
+    Start-Sleep 5
+    }
+
+Start-Sleep 60
+}
+
