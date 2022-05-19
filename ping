@@ -1,0 +1,8 @@
+$Host.UI.RawUI.WindowTitle = "Gateway 192.168.1.1"
+while ($true) {
+$ping = (Test-Connection 192.168.1.1 -Count 1).ResponseTime
+if ($ping -gt 20) {
+Write-Host "$(Get-Date -Format G) - Alerta de latencia ($($ping)ms)"
+}
+Start-Sleep 10
+}
