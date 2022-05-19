@@ -1,0 +1,23 @@
+(Get-Host).UI.RawUI.WindowTitle =  "www.google.com"
+
+while ($true)
+{
+
+            try
+				{
+				 $resp = (Invoke-WebRequest -Uri "www.google.com" -UseBasicParsing -DisableKeepAlive).StatusCode
+				 if ($resp -ne 200)
+						{
+						Write-Host "$(Get-Date -Format G) Estado $resp" -ForegroundColor yellow
+						[console]::beep(2000,500)
+						}
+                }
+              
+           catch [System.Net.WebException]
+                {              
+                  Write-Host "$(Get-Date -Format G) - $_.Exception.Response" -ForegroundColor red
+                  [console]::beep(2000,500)
+                   
+                }
+            Start-Sleep 10 
+}
