@@ -1,0 +1,38 @@
+$D=Get-Date -Format “ddMMyyyyhhmmss”
+Start-Transcript log$D.txt -Append
+
+$CompName = "8.8.8.8","8.8.4.4","1.2.3.4"
+(Get-Host).UI.RawUI.WindowTitle =  $CompName
+
+while ($true) {
+
+	foreach ($comp in $CompName) 
+	    {
+		try
+           {	
+				$ping = (Test-Connection -ComputerName $comp -Count 1 -ErrorAction 
+
+stop).ResponseTime
+				if ($ping -gt 100) 
+				  {
+					Write-Host "$(Get-Date -Format G) - $comp -  Alerta de latencia 
+
+($($ping)ms)" -ForegroundColor yellow
+					[console]::beep(2000,500)
+				  }
+		   }
+         catch [System.Net.NetworkInformation.PingException]
+              { 				
+				Write-Host "$(Get-Date -Format G) - $comp -  sin conexion" -
+
+ForegroundColor red
+				[console]::beep(2000,500)
+              }  
+		Start-Sleep 1	
+	    }
+
+Start-Sleep 1
+}
+
+
+
