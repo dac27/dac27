@@ -1,0 +1,53 @@
+import socketserver
+from http import server
+
+
+
+PAGINA_HTML="""\
+<html>
+<head>
+<title>Ejemplo Web Server</title>
+</head>
+<body>
+<center><h1>Web Server</h1></center>
+<center><img src="imagen.jpg" width="400" height="225"></center>
+</body>
+</html>
+"""
+
+class RequestHandler(server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/':
+            self.send_response(301)
+            self.send_header('Location', '/index.html')
+            self.end_headers()
+        elif self.path == '/index.html':
+            content = PAGINA_HTML.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
+        elif self.path == '/imagen.jpg':
+            self.send_response(200)
+            self.send_header('Age', 0)
+            self.send_header('Cache-Control', 'no-cache, private')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Content-Type', 'image/jpeg')
+            self.end_headers()
+           
+            fileObj = open("D:/ruta_de_la_imagen/imagen.jpg","rb")
+            image = fileObj.read()
+            self.wfile.write(image)
+
+        else:
+            self.send_error(404)
+            self.end_headers()
+
+class ThreadedHTTPServer(socketserver.ThreadingMixIn, server.HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+address = ('', 8000)
+server = ThreadedHTTPServer(address, RequestHandler)
+server.serve_forever()
